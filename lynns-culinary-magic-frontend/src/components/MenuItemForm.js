@@ -20,7 +20,7 @@ const MenuItemForm = () => {
     setError('');
     setSuccess('');
     try {
-      const response = await axios.post("http://localhost:5000/api/menu-items", formData);
+      const response = await axios.post("http://localhost:5020/api/menu-items", formData);
       console.log("Full response:", response);
       if (response.data.success) {
         setSuccess('Menu item added successfully!');
