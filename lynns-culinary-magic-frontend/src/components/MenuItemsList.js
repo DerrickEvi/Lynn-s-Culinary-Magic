@@ -6,7 +6,7 @@ const MenuItemsList = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editingItem, setEditingItem] = useState(null);
+  const [editingItemId, setEditingItemId] = useState(null);
 
   useEffect(() => {
     fetchMenuItems();
@@ -32,13 +32,22 @@ const MenuItemsList = () => {
     }
   };
 
-  const handleEditClick = (item) => {
-    setEditingItem(item);
+  const handleEditClick = (id) => {
+    setEditingItemId(id);
   };
 
-  const handleSaveEdit = () => {
-    setEditingItem(null);
-    fetchMenuItems();
+  const handleSaveEdit = async (id, updatedData) => {
+    try {
+      const response = await axios.put(`http://localhost:5020/api/menu-items/${id}`, updatedData);
+      setMenuItems(menuItems.map(item => item._id === id ? response.data.data : item));
+      setEditingItemId(null);
+    } catch (error) {
+      setError("Error updating menu item. Please try again.");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -53,11 +62,11 @@ const MenuItemsList = () => {
         <ul>
           {menuItems.map((item) => (
             <li key={item._id}>
-              {editingItem && editingItem._id === item._id ? (
+              {editingItemId === item._id ? (
                 <EditMenuItemForm 
                   item={item} 
-                  onSave={handleSaveEdit}
-                  onCancel={() => setEditingItem(null)}
+                  onSave={(updatedData) => handleSaveEdit(item._id, updatedData)}
+                  onCancel={handleCancelEdit}
                 />
               ) : (
                 <>
@@ -66,7 +75,7 @@ const MenuItemsList = () => {
                   <p>Price: ${item.price}</p>
                   <p>Category: {item.category}</p>
                   <button onClick={() => deleteMenuItem(item._id)}>Delete</button>
-                  <button onClick={() => handleEditClick(item)}>Edit</button>
+                  <button onClick={() => handleEditClick(item._id)}>Edit</button>
                 </>
               )}
             </li>
