@@ -6,18 +6,23 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      await login(email, password);
-      navigate('/menu');
+      const result = await login(email, password);
+      console.log('Login result:', result);  
+      if (result && result.token) {
+        navigate('/menu');
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
     } catch (error) {
       console.error('Login error:', error);
-      setError(error.message || 'Failed to login');
+      setError(error.message || 'An error occurred during login. Please try again.');
     }
   };
 
@@ -25,7 +30,6 @@ const Login = () => {
     <form onSubmit={handleSubmit}>
       <h2>Login</h2>
       {error && <p style={{color: 'red'}}>{error}</p>}
-      <p>Current user: {user ? 'Logged In' : 'Not Logged In'}</p>
       <input
         type="email"
         value={email}

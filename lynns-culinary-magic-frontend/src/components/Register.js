@@ -14,13 +14,16 @@ const Register = () => {
     e.preventDefault();
     setError('');
     try {
-      console.log('Attempting to register with:', { username, email, password });
-      const response = await register(username, email, password);
-      console.log('Registration response:', response);
-      navigate('/menu');
+      const result = await register(username, email, password);
+      console.log('Register result:', result);  
+      if (result && result.token) {
+        navigate('/menu');
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     } catch (error) {
       console.error('Registration error:', error);
-      setError(error.message || 'Failed to register');
+      setError(error.message || 'An error occurred during registration. Please try again.');
     }
   };
 
